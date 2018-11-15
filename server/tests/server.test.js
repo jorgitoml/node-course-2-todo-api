@@ -1,14 +1,27 @@
 const expect = require('expect');
 const request = require('supertest');
+const {ObjectID} = require('mongodb');
 
 const {app} = require('../server');
 const {Todo} = require('../models/todo');
 
 const test_todos = [
-    {text:'First test todo'},
-    {text:'Second test todo'},
-    {text:'Third test todo'},
-    {text:'Fourth test todo'}
+    {
+        _id: new ObjectID(),
+        text:'First test todo'
+    },
+    {
+        _id: new ObjectID(),
+        text:'Second test todo'
+    },
+    {
+        _id: new ObjectID(),
+        text:'Third test todo'
+    },
+    {
+        _id: new ObjectID(),
+        text:'Fourth test todo'
+    }
 ];
 
 beforeEach((done)=>{
@@ -64,6 +77,35 @@ describe('GET /todos',()=>{
             .expect((res)=>{
                 expect(res.body.todos.length).toBe(test_todos.length);
             })
+            .end(done);
+    });
+});
+
+describe('GET /todos/:id',()=>{
+    it('should return todo doc',(done)=>{
+        request(app)
+            .get(`/todos/${test_todos[0]._id.toHexString()}`)
+            .expect(200)
+            .expect((res)=>{
+                expect(res.body.todo.text).toBe(test_todos[0].text)
+            })
+            .end(done);
+    });
+
+    it('should return 404 if todo not found',(done)=>{
+
+        const id = new ObjectID().toHexString();
+
+        request(app)
+            .get(`/todos/${id}`)
+            .expect(404)
+            .end(done);
+    });
+
+    it('should return 404 if wrong objectid',(done)=>{
+        request(app)
+            .get('/todos/1234abcd')
+            .expect(404)
             .end(done);
     });
 });
