@@ -54,7 +54,7 @@ app.delete('/todos/:id',(req,res)=>{
 
     if(!ObjectID.isValid(id)) return res.status(404).send();
 
-    Todo.findByIdAndRemove(id).then((todo)=>{
+    Todo.findByIdAndDelete(id).then((todo)=>{
         if(!todo) return res.status(404).send();
 
         res.send({todo});
@@ -106,8 +106,6 @@ app.post('/users', (req, res) => {
 app.get('/users/me',authenticate,(req,res)=>{
     res.send(req.user);
 });
-
-
 
 app.listen(port,()=>{
     console.log(`Server started on port ${port}`);
